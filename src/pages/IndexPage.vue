@@ -7,17 +7,17 @@
         size="large"
         @search="onSearch"
     />
-    {{ JSON.stringify(searchParams) }}
+<!--    {{ JSON.stringify(postList) }}-->
     <my-divider/>
     <a-tabs v-model:activeKey="activeKey" @change="onTabChange">
       <a-tab-pane key="post" tab="文章">
-        <PostList/>
+        <PostList :postList="postList" />
       </a-tab-pane>
       <a-tab-pane key="picture" tab="图片" force-render>
-        <PictureList/>
+        <PictureList />
       </a-tab-pane>
       <a-tab-pane key="user" tab="用户">
-        <UserList/>
+        <UserList :user-list="userList"/>
       </a-tab-pane>
     </a-tabs>
   </div>
@@ -32,8 +32,11 @@ import PictureList from "../components/PictureList.vue";
 import UserList from "../components/UserList.vue";
 import MyDivider from "../components/MyDivider.vue";
 import {useRoute, useRouter} from "vue-router";
-import axios from "../plugins/myAxios";
 import myAxios from "../plugins/myAxios";
+
+const postList = ref([])
+const userList = ref([])
+
 
 const router = useRouter();
 const route = useRoute();
@@ -68,9 +71,14 @@ const onTabChange = (key: string) => {
 }
 
 
-myAxios.get('/post/get/vo?id=1859134210876383234'
-).then((res) => {
-  console.log(res)
+myAxios.post('/post/list/page/vo',{}
+).then((res: any) => {
+  postList.value = res.records;
+})
+
+myAxios.post('/user/list/page/vo',{}
+).then((res: any) => {
+  userList.value = res.records;
 })
 
 
