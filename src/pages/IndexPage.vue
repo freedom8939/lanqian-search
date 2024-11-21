@@ -7,14 +7,14 @@
         size="large"
         @search="onSearch"
     />
-<!--    {{ JSON.stringify(postList) }}-->
+    <!--    {{ JSON.stringify(postList) }}-->
     <my-divider/>
     <a-tabs v-model:activeKey="activeKey" @change="onTabChange">
       <a-tab-pane key="post" tab="文章">
-        <PostList :postList="postList" />
+        <PostList :postList="postList"/>
       </a-tab-pane>
       <a-tab-pane key="picture" tab="图片" force-render>
-        <PictureList />
+        <PictureList :picture-list="pictureList"/>
       </a-tab-pane>
       <a-tab-pane key="user" tab="用户">
         <UserList :user-list="userList"/>
@@ -36,7 +36,7 @@ import myAxios from "../plugins/myAxios";
 
 const postList = ref([])
 const userList = ref([])
-
+const pictureList = ref([])
 
 const router = useRouter();
 const route = useRoute();
@@ -45,7 +45,41 @@ const initSearchParams = {
   pageNum: 1,
 }
 
+//加载数据
+const loadData = (params: any) => {
+  const postQuery = {
+    ...params,
+    searchText: params.text
+  }
+
+  myAxios.post('/post/list/page/vo', postQuery
+  ).then((res: any) => {
+    postList.value = res.records;
+  })
+
+  const userQuery = {
+    ...params,
+    userName: params.text
+  }
+  myAxios.post('/user/list/page/vo', userQuery
+  ).then((res: any) => {
+    userList.value = res.records;
+  })
+
+  const pictureQuery = {
+    ...params,
+    searchText: params.text
+  }
+  myAxios.post('/picture/list/page/vo', postQuery
+  ).then((res: any) => {
+    pictureList.value = res.records;
+  })
+
+}
+
 const searchParams = ref(initSearchParams)
+//初始化
+loadData(initSearchParams);
 
 watchEffect(() => {
   searchParams.value = {
@@ -55,12 +89,12 @@ watchEffect(() => {
 })
 
 const activeKey = route.params.category;
-const onSearch = (value: string) => {
+const onSearch = () => {
   router.push({
     query: searchParams.value
   })
+  loadData(searchParams.value);
 };
-
 
 //tab栏切换
 const onTabChange = (key: string) => {
@@ -69,18 +103,6 @@ const onTabChange = (key: string) => {
     query: searchParams.value
   })
 }
-
-
-myAxios.post('/post/list/page/vo',{}
-).then((res: any) => {
-  postList.value = res.records;
-})
-
-myAxios.post('/user/list/page/vo',{}
-).then((res: any) => {
-  userList.value = res.records;
-})
-
 
 </script>
 
