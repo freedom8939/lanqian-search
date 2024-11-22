@@ -46,12 +46,12 @@ const initSearchParams = {
 }
 
 //加载数据
-const loadData = (params: any) => {
+const loadDataOld = (params: any) => {
+
   const postQuery = {
     ...params,
     searchText: params.text
   }
-
   myAxios.post('/post/list/page/vo', postQuery
   ).then((res: any) => {
     postList.value = res.records;
@@ -73,6 +73,20 @@ const loadData = (params: any) => {
   myAxios.post('/picture/list/page/vo', postQuery
   ).then((res: any) => {
     pictureList.value = res.records;
+  })
+
+}
+
+const loadData = (params: any) => {
+  const query = {
+    ...params,
+    searchText: params.text
+  }
+  myAxios.post('/search/all', query
+  ).then((res: any) => {
+    postList.value = res.postList;
+    userList.value = res.userList;
+    pictureList.value = res.pictureList;
   })
 
 }
